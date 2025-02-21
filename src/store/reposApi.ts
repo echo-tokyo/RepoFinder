@@ -9,7 +9,7 @@ export const reposApi = createApi({
     prepareHeaders: (headers) => {
       headers.set(
         'Authorization',
-        `token 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`,
+        `token ${process.env.REACT_APP_GITHUB_TOKEN}`,
       )
       headers.set('X-GitHub-Api-Version', '2022-11-28')
       return headers

@@ -16,7 +16,7 @@ function App() {
     const handler = setTimeout(() => {
       setDebouncedUsername(username)
       setShouldClearRepos(username === '')
-    }, 500)
+    }, 300)
 
     return () => {
       clearTimeout(handler)

@@ -1,12 +1,10 @@
-import { ChangeEvent, useState, useEffect } from 'react'
-import Card from './components/Card'
-import { useGetReposQuery } from './store/reposApi'
-import { IRepo } from './types/repo'
+import { ChangeEvent, useEffect, useState } from 'react'
+import RepoList from './components/Repos/RepoList'
+import { useGetReposQuery } from './store/api/repos.api'
 
 function App() {
   const [username, setUsername] = useState<string>('')
   const [debouncedUsername, setDebouncedUsername] = useState<string>(username)
-  const [shouldClearRepos, setShouldClearRepos] = useState<boolean>(false)
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     setUsername(e.target.value)
@@ -15,15 +13,19 @@ function App() {
   useEffect(() => {
     const handler = setTimeout(() => {
       setDebouncedUsername(username)
-      setShouldClearRepos(username === '')
-    }, 300)
+    }, 500)
 
     return () => {
       clearTimeout(handler)
     }
   }, [username])
 
-  const { data: repos, isError, isFetching } = useGetReposQuery(debouncedUsername, {
+  const {
+    data: repos,
+    isError,
+    isFetching,
+    error,
+  } = useGetReposQuery(debouncedUsername, {
     skip: debouncedUsername === '',
   })
 
@@ -37,17 +39,12 @@ function App() {
         />
       </form>
       {isFetching && <p>Загрузка...</p>}
-      {isError && <p>Пользователь не найден</p>}
-        {!shouldClearRepos &&repos && username && !isFetching && !isError && (
-          <>
-            {repos.length === 0 ? (
-              <p>Репозиториев у пользователя нет</p>
-            ) : (
-              repos.map((el: IRepo) => <Card el={el} key={el.id} />)
-            )}
-          </>
-        )
-      }
+      {isError && (
+        <p>{(error as { data: { message: string } }).data.message}</p>
+      )}
+      {debouncedUsername && repos && !isFetching && !isError && (
+        <RepoList repos={repos} />
+      )}
     </>
   )
 }

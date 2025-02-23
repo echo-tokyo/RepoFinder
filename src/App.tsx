@@ -1,33 +1,28 @@
-import { ChangeEvent, useEffect, useState } from 'react'
+import { ChangeEvent, useState } from 'react'
 import RepoList from './components/Repos/RepoList'
-import { useGetReposQuery } from './store/api/repos.api'
+import useDebouncedValue from './hooks/useDebouncedValue'
+import useReposQuery from './hooks/useReposQuery'
 
 function App() {
   const [username, setUsername] = useState<string>('')
-  const [debouncedUsername, setDebouncedUsername] = useState<string>(username)
+  const [page, setPage] = useState<number>(1)
+  const perPage = 20
 
+  // Дебаунс
+  const debouncedUsername = useDebouncedValue(username, 500)
+
+  // API
+  const { data, isError, error, isFetching } = useReposQuery(
+    debouncedUsername,
+    page,
+    perPage,
+  )
+
+  // Сеттеры
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     setUsername(e.target.value)
+    setPage(1)
   }
-
-  useEffect(() => {
-    const handler = setTimeout(() => {
-      setDebouncedUsername(username)
-    }, 500)
-
-    return () => {
-      clearTimeout(handler)
-    }
-  }, [username])
-
-  const {
-    data: repos,
-    isError,
-    isFetching,
-    error,
-  } = useGetReposQuery(debouncedUsername, {
-    skip: debouncedUsername === '',
-  })
 
   return (
     <>
@@ -38,13 +33,13 @@ function App() {
           onChange={handleChange}
         />
       </form>
-      {isFetching && <p>Загрузка...</p>}
-      {isError && (
+      {isError ? (
         <p>{(error as { data: { message: string } }).data.message}</p>
-      )}
-      {debouncedUsername && repos && !isFetching && !isError && (
-        <RepoList repos={repos} />
-      )}
+      ) : isFetching ? (
+        <p>Загрузка...</p>
+      ) : debouncedUsername ? (
+        <RepoList repos={data} />
+      ) : null}
     </>
   )
 }

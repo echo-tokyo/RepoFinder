@@ -1,22 +1,23 @@
-import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
+import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 
-const API_URL = 'https://api.github.com/'
+const API_URL = 'https://api.github.com/';
 
 export const reposApi = createApi({
   reducerPath: 'reposApi',
   baseQuery: fetchBaseQuery({
     baseUrl: API_URL,
     prepareHeaders: (headers) => {
-      headers.set('Authorization', `token ${import.meta.env.VITE_GITHUB_TOKEN}`)
-      headers.set('X-GitHub-Api-Version', '2022-11-28')
-      return headers
+      headers.set('Authorization', `token ${import.meta.env.VITE_GITHUB_TOKEN}`);
+      headers.set('X-GitHub-Api-Version', '2022-11-28');
+      return headers;
     },
   }),
   endpoints: (build) => ({
     getRepos: build.query({
-      query: (username) => `/users/${username}/repos`,
+      query: ({ username, page, perPage }) => 
+        `/users/${username}/repos?per_page=${perPage}&page=${page}`,
     }),
   }),
-})
+});
 
-export const { useGetReposQuery } = reposApi
+export const { useGetReposQuery } = reposApi;

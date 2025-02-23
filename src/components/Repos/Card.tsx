@@ -1,9 +1,8 @@
 import { ICardProps } from '../../types/props'
 
 const Card: React.FC<ICardProps> = ({ el }) => {
-  console.log(el)
   return (
-    <div>
+    <div id={String(el.id)} >
       <p>Название репозитория: {el.name}</p>
       {el.description && <p>Описание: {el.description}</p>}
       <p>Звёзды: {el.stargazers_count}</p>

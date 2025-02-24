@@ -17,7 +17,10 @@ export const reposApi = createApi({
       query: ({ username, page, perPage }) => 
         `/users/${username}/repos?per_page=${perPage}&page=${page}`,
     }),
+    getUser: build.query({
+      query: ({username}) => `/users/${username}`
+    })
   }),
 });
 
-export const { useGetReposQuery } = reposApi;
+export const { useGetReposQuery, useGetUserQuery } = reposApi;

@@ -12,41 +12,41 @@ function App() {
   const [repos, setRepos] = useState<IRepo[]>([])
   const perPage = 20
   
-  // Дебаунс
+  // Debounce
   const debouncedUsername = useDebouncedValue(username, 1000)
+
+  useEffect(() => {
+    setRepos([])
+    setPage(1)
+  }, [debouncedUsername])
   
   // API
-  const { isSuccess } = useUserQuery(debouncedUsername)
+  const { data: userData, isSuccess } = useUserQuery(debouncedUsername)
   const { data, isError, error, isFetching } = useReposQuery(
     debouncedUsername,
     page,
     perPage,
   )
   
-  // Сброс репозиториев при изменении имени пользователя
+  // .then
   useEffect(() => {
-    setRepos([])
-    setPage(1)
-  }, [debouncedUsername, username])
-  
-  // Обновление репозиториев при получении новых данных
-  useEffect(() => {
-    if (isSuccess && Array.isArray(data)) {
-      setRepos([...repos, ...data])
+    console.log(repos)
+    if (isSuccess && Array.isArray(data) && !isFetching) {
+      setRepos(prev => [...prev, ...data])
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data, isSuccess])
-  
-  // Скролл
+
+  // Pagination scroll
   useScrollLoadMore(() => {
-    setPage((prev) => prev + 1)
-  })
+      setPage((prev) => prev + 1)
+  }, userData, repos)
   
-  // Сеттеры
+  // Setters
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     setUsername(e.target.value)
   }
-  
+
   return (
     <>
       <form action=''>
@@ -56,11 +56,13 @@ function App() {
           onChange={handleChange}
         />
       </form>
+
       {isError ? (
         <p>{(error as { data: { message: string } }).data.message}</p>
       ) : (
         <>
-        {repos.length !== 0 && <RepoList repos={repos} />}
+        {debouncedUsername && repos.length === 0 && !isFetching && data && data.length === 0 && <p>Репозиториев нет</p>}
+        {debouncedUsername && <RepoList repos={repos} />}
         {isFetching && <p>Загрузка...</p>}
         </>
       )}

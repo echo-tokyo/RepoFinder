@@ -1,15 +1,29 @@
-import { useEffect } from 'react'
+import { useEffect, useRef } from 'react'
 import { IRepo } from '../types/repo'
+import { IUserData } from '../types/query'
 
-const useScrollLoadMore = (loadMore: () => void, userdata: { public_repos: number }, repos: IRepo[]) => {
+const useScrollLoadMore = (
+  loadMore: () => void,
+  userData: IUserData,
+  repos: IRepo[],
+  isFetching: boolean,
+) => {
+  const isLoadingRef = useRef(false)
+
   useEffect(() => {
     const scrollHandler = (e: Event) => {
       const target = e.target as Document
-      if (
+      const nearBottom =
         target.documentElement.scrollHeight -
-        (target.documentElement.scrollTop + window.innerHeight) <
-        100 && userdata.public_repos !== repos.length
+          (target.documentElement.scrollTop + window.innerHeight) <
+        100
+
+      if (
+        nearBottom &&
+        repos.length < userData.public_repos &&
+        !isLoadingRef.current
       ) {
+        isLoadingRef.current = true
         loadMore()
       }
     }
@@ -19,8 +33,13 @@ const useScrollLoadMore = (loadMore: () => void, userdata: { public_repos: numbe
     return () => {
       document.removeEventListener('scroll', scrollHandler)
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [loadMore])
+  }, [loadMore, userData, repos.length])
+
+  useEffect(() => {
+    if (!isFetching) {
+      isLoadingRef.current = false
+    }
+  }, [isFetching])
 }
 
 export default useScrollLoadMore

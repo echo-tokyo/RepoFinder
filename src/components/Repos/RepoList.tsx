@@ -1,7 +1,9 @@
+import { useTypedSelector } from '../../hooks/useTypedSelector'
 import { IRepo } from '../../types/repo'
 import Card from './Card'
 
-const RepoList = ({ repos }: { repos: IRepo[] }) => {
+const RepoList = () => {
+  const repos = useTypedSelector(state => state.repos)
   return (
     <>
     <div className="">

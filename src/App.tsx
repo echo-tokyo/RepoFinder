@@ -4,6 +4,7 @@ import useDebouncedValue from './hooks/useDebouncedValue'
 import useReposQuery from './hooks/useReposQuery'
 import useUserQuery from './hooks/useUserQuery'
 import { IRepo } from './types/repo'
+import useScrollLoadMore from './hooks/useScrollHandler'
 
 function App() {
   const [username, setUsername] = useState<string>('')
@@ -22,31 +23,17 @@ function App() {
     perPage,
   )
 
-  // observer
+  // .then
   useEffect(() => {
     if (isSuccess && Array.isArray(data)) {
       setRepos((prevRepos) => [...prevRepos, ...data])
     }
   }, [data, isSuccess])
 
-  useEffect(() => {
-    document.addEventListener('scroll', scrollHandler)
-
-    return function () {
-      document.removeEventListener('scroll', scrollHandler)
-    }
-  }, [])
-
-  const scrollHandler = (e: Event) => {
-    const target = e.target as Document
-    if (
-      target.documentElement.scrollHeight -
-        (target.documentElement.scrollTop + window.innerHeight) <
-      100
-    ) {
-      setPage((prev) => prev + 1)
-    }
-  }
+  // Скролл
+  useScrollLoadMore(() => {
+    setPage((prev) => prev + 1)
+  })
 
   // Сеттеры
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -64,6 +51,7 @@ function App() {
           onChange={handleChange}
         />
       </form>
+
       {isError ? (
         <p>{(error as { data: { message: string } }).data.message}</p>
       ) : (

@@ -1,0 +1,15 @@
+.repos{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  margin-top: 5px;
+  gap: 5px;
+}
+.repo{
+  display: flex;
+  gap: 10px;
+  width: 90%;
+  padding: 10px;
+  background-color: rgb(41, 41, 41);
+}

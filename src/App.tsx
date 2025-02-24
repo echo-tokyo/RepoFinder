@@ -8,6 +8,7 @@ import { useDispatch } from 'react-redux'
 import { resetRepos, updateRepos } from './store/repos/repos.slice'
 import { IQuery } from './types/query'
 import useScrollHandler from './hooks/useScrollHandler'
+import './app.scss'
 
 function App() {
   const dispatch = useDispatch()
@@ -47,7 +48,7 @@ function App() {
     },
     userData,
     repos,
-    isFetching
+    isFetching,
   )
 
   // Setters
@@ -66,16 +67,18 @@ function App() {
       </form>
 
       {isError ? (
-        <p>{(error as { data: { message: string } }).data.message}</p>
+        <p className='status'>
+          {(error as { data: { message: string } }).data.message}
+        </p>
       ) : (
         <>
           {debouncedUsername &&
             repos.length === 0 &&
             !isFetching &&
             data &&
-            data.length === 0 && <p>Репозиториев нет</p>}
+            data.length === 0 && <p className='status'>Репозиториев у пользователя "{userData.login}" нет</p>}
           {debouncedUsername && <RepoList />}
-          {isFetching && <p>Загрузка...</p>}
+          {isFetching && <p className='status'>Загрузка...</p>}
         </>
       )}
     </>

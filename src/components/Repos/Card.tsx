@@ -1,12 +1,15 @@
 import { ICardProps } from '../../types/props'
 
-const Card: React.FC<ICardProps> = ({ el }) => {
+const Card: React.FC<ICardProps> = ({ el, index }) => {
   return (
-    <div id={String(el.id)} >
-      <p>Название репозитория: {el.name}</p>
-      {el.description && <p>Описание: {el.description}</p>}
-      <p>Звёзды: {el.stargazers_count}</p>
-      <a href={el.clone_url}>Ссылка</a>
+    <div id={String(el.id)} className='repo'>
+      <p>{index + 1})</p>
+      <div className="">
+        <p>Название репозитория: <span style={{fontWeight: 'bold'}}>{el.name}</span></p>
+        {el.description && <p>Описание: <span style={{fontWeight: 'bold'}}>{el.description}</span></p>}
+        <p>Звёзды: <span style={{fontWeight: 'bold'}}>{el.name}</span></p>
+        <a href={el.clone_url}>Ссылка</a>
+      </div>
     </div>
   )
 }
